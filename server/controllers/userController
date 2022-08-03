@@ -1,0 +1,65 @@
+const User = require('../models/userModel')
+const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken')
+
+//@desc register a new user
+//@param POST /users/register
+//@access public
+exports.register= async(req,res)=>{
+    try {
+        const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+        const {firstName,lastName,email,address,age,password,gender,role}=req.body
+        const {file}=req
+        const existUser= await User.findOne({email})
+        if(existUser)
+            return res.status(400).json({msg:'user exists'})
+        var salt = bcrypt.genSaltSync(12);
+        var hash = bcrypt.hashSync(password, salt);
+        const newUser = await  User.create({firstName,lastName,email,address,age,password:hash,age,gender,image:(file && file.path),role})
+        const token=jwt.sign({sub:newUser._id},process.env.JWT_SECRET)
+        res.json({success:true,token});
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({msg:'something went wrong'})
+    }
+}
+
+
+//@desc login as a user
+//@param POST /users/login
+//@access public
+exports.login= async(req,res)=>{
+    try {
+      
+        const {firstName,lastName,email,address,password,gender,role}=req.body
+        const existUser= await User.findOne({email})
+        if(!existUser)
+            return res.status(400).json({msg:'you should register first'})
+        var validate = await bcrypt.compare(password, existUser.password);
+       if(!validate) 
+        return res.status(400).json({msg:'invalid password'})
+        const token=jwt.sign({sub:existUser._id},process.env.JWT_SECRET)
+        res.json({success:true,token});
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({msg:'something went wrong'})
+    }
+}
+
+
+//@desc login as a user
+//@param GET /users/
+//@access private
+exports.getUserInfo=async(req,res)=>{
+    try {
+        const userInfo= await User.findById(req.userId) //.select('password -__v');
+        res.json(userInfo);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({msg:'something went wrong'})
+    }
+}

@@ -1,0 +1,18 @@
+.container *{
+    color:rgb(148, 143, 143) ;
+}
+a{
+    text-decoration:none;
+    margin-left:2%;
+    margin-top:0.5%
+}
+.input-group {
+    
+    width: 20%;
+  }
+.logout{
+    margin-left:2%;
+  }
+a:hover{
+    color:#F2DF3A;
+}
