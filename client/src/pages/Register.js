@@ -5,9 +5,17 @@ import {useDispatch,useSelector} from 'react-redux'
 import {registerUser} from '../slices/userSlice'
 import {useNavigate} from'react-router-dom'
 import { Link } from "react-router-dom";
+import * as yup from 'yup';
 
 const Register = () => {
-
+ /* const schema=yup.object().shape({
+    image:yup
+    .mixed()
+    .required("you need to provide ")
+    .test("filesize","the file is too large",(value)=>{
+      console.log(value)
+    return value && value[0].size<=2000000})
+  })*/
   const dispatch= useDispatch()
   const {errors: userErrors,isAuth}=useSelector(state =>state.user)
   const nav=useNavigate()
@@ -16,21 +24,29 @@ const Register = () => {
     nav('/')
 
   },[isAuth])
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm(/*{validationSchema:schema}*/);
  
   const submitFnct=(data)=>{
 
   dispatch(registerUser(data))
-  
+      
   }
-  
   return (
     <div>
       <div className="container-fluid ">
           <div className="row d-flex justify-content-center   ">
             <div className="col-sm-5 text-black">
         <Form onSubmit={handleSubmit(submitFnct)} encType="multipart/form-data">
+
+        <Form.Group className="mb-3" controlId="formBasicFile">
+            <Form.Label>Image</Form.Label>
+            <Form.Control {...register("image")}    type="file" accept=".png, .jpg, .jpeg" name="image" />
+            {errors.image && <p>{errors.image.message}</p>}
+          </Form.Group>
+
+
           <Form.Group className="mb-3" controlId="formBasicText" >
+            
             <Form.Label>Prénom</Form.Label>
             <Form.Control {...register("firstName",{ pattern: /^[A-Za-z]+$/i })} type="text" placeholder="Entrez votre prénom" />
             
@@ -73,9 +89,9 @@ const Register = () => {
 
           <Form.Group className="mb-3" controlId="formBasicFile">
             <Form.Label>Image</Form.Label>
-            <Form.Control {...register("image")}  type="file" accept=".png, .jpg, .jpeg" name="image" />
+            <Form.Control {...register("image")}    type="file" accept=".png, .jpg, .jpeg" name="image" />
+            {errors.image && <p>{errors.image.message}</p>}
           </Form.Group>
-
 
           <div className="pt-1 mb-4">
                     <button

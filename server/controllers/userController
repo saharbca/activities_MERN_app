@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 
+
 //@desc register a new user
 //@param POST /users/register
 //@access public
@@ -12,14 +13,16 @@ exports.register= async(req,res)=>{
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-        const {firstName,lastName,email,address,age,password,gender,role}=req.body
-        const {file}=req
+        const {firstName,lastName,email,address,age,password,gender,image,role}=req.body
+        
         const existUser= await User.findOne({email})
         if(existUser)
             return res.status(400).json({msg:'user exists'})
         var salt = bcrypt.genSaltSync(12);
         var hash = bcrypt.hashSync(password, salt);
-        const newUser = await  User.create({firstName,lastName,email,address,age,password:hash,age,gender,image:(file && file.path),role})
+        const newUser = await  User.create({firstName,lastName,email,address,age,password:hash,age,gender,
+                                            image,role})
+                                         
         const token=jwt.sign({sub:newUser._id},process.env.JWT_SECRET)
         res.json({success:true,token});
     } catch (error) {
@@ -43,7 +46,9 @@ exports.login= async(req,res)=>{
        if(!validate) 
         return res.status(400).json({msg:'invalid password'})
         const token=jwt.sign({sub:existUser._id},process.env.JWT_SECRET)
-        res.json({success:true,token});
+        res.json({success:true,token,userInfo:{firstName:existUser.firstName,lastName:existUser.lastName,
+                                                email:existUser.email,address:existUser.address,password:existUser.password,
+                                                gender:existUser.gender,role:existUser.role}});
     } catch (error) {
         console.log(error)
         res.status(500).json({msg:'something went wrong'})
@@ -56,7 +61,7 @@ exports.login= async(req,res)=>{
 //@access private
 exports.getUserInfo=async(req,res)=>{
     try {
-        const userInfo= await User.findById(req.userId) //.select('password -__v');
+        const userInfo= await User.findById(req.userId).select('-password -__v');
         res.json(userInfo);
     } catch (error) {
         console.log(error)

@@ -3,22 +3,21 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import {Form,Button} from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../slices/userSlice";
+import { loginUser,getUserInfo } from "../slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import img from "../imgs/login.png"
 const Login = () => {
   const dispatch = useDispatch();
-  const { errors: userErrors, isAuth } = useSelector((state) => state.user);
+  const { errors: userErrors, isAuth, userInfo } = useSelector((state) => state.user);
   const nav = useNavigate();
   useEffect(() => {
-    if (isAuth) nav("/profile");
-  }, [isAuth]);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
+    dispatch(getUserInfo())
+    if (isAuth && userInfo.role==='user') 
+    nav("/profile");
+    else if(isAuth && userInfo.role==='admin') 
+    nav("/dashbord");
+  }, [isAuth,nav,userInfo.role]);
+  const {register, handleSubmit, formState: { errors },} = useForm();
   const submitFnct = (data) => {
     dispatch(loginUser(data));
   };

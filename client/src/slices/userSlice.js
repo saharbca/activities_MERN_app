@@ -23,6 +23,18 @@ export const loginUser= createAsyncThunk('user/loginUser',async(info,{rejectWith
             : error.message)
     }
 })
+
+export const getUserInfo= createAsyncThunk('user/getUserInfo',async(info,{rejectWithValue})=>{
+    try {
+        const res = await axios.get('/users',{headers:{token:localStorage.getItem('token')},})
+        return res.data
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.msg
+            ? error.response.data.msg
+            : error.message)
+    }
+})
 const userSlice = createSlice({
     name:'user',
     initialState: {
@@ -36,6 +48,8 @@ const userSlice = createSlice({
             localStorage.clear()
             state.token = null
             state.isAuth=false
+            state.userInfo={}
+            state.errors=null
         }, 
     },
 extraReducers:{
@@ -43,6 +57,7 @@ extraReducers:{
         state.token=action.payload.token
         localStorage.setItem('token',action.payload.token)
         localStorage.setItem('isAuth',true)
+        state.userInfo=action.payload.userInfo
         state.isAuth=true
         state.errors=null
     },
@@ -53,12 +68,20 @@ extraReducers:{
         state.token=action.payload.token
         localStorage.setItem('token',action.payload.token)
         localStorage.setItem('isAuth',true)
+        state.userInfo=action.payload.userInfo
         state.isAuth=true
         state.errors=null
         },
     [loginUser.rejected]:(state,action)=>{
         state.errors= action.payload
     },
+    [getUserInfo.fulfilled]:(state,action)=>{
+        state.userInfo=action.payload
+        state.errors=null
+        },
+    [getUserInfo.rejected]:(state,action)=>{
+        state.errors= action.payload
+    }
 }
 });
 

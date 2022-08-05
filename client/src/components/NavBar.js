@@ -12,7 +12,7 @@ const NavBar = () => {
     e.preventDefault();
     dispatch(logout())
   }
-  const {isAuth}=useSelector(state =>state.user)
+  const {isAuth,userInfo}=useSelector(state =>state.user)
   
   return (
     <div>
@@ -22,9 +22,14 @@ const NavBar = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="container">
             <Link to='/'>Accueil</Link>
+            {isAuth ?  userInfo.role==="admin" &&(
+              <>
+            <Link to='/dashbord'>Dashbord</Link>
+            <Link to='/profile'>Profile</Link>
+            </>
+            ):<></>}
             {isAuth ?   ( 
               <>  
-              <Link to='/profile'>Profile</Link>
               
               <div className="input-group mb-3 ms-auto " >
                 <input type="text" className="form-control"  style={{width:"10%"}}/>

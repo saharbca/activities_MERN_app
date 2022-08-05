@@ -11,3 +11,4 @@ app.use('/users',require('./routes/userRoute'))
 app.listen(process.env.port,()=>console.log('listening on port ',process.env.port))
 
 
+//app.use(express.static('./public'))
