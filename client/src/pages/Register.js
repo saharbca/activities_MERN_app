@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useState } from 'react'
 import { useForm } from "react-hook-form";
 import Form from 'react-bootstrap/Form';
 import {useDispatch,useSelector} from 'react-redux'
@@ -6,8 +6,7 @@ import {registerUser} from '../slices/userSlice'
 import {useNavigate} from'react-router-dom'
 import { Link } from "react-router-dom";
 import * as yup from 'yup';
-
-const Register = () => {
+ 
  /* const schema=yup.object().shape({
     image:yup
     .mixed()
@@ -16,20 +15,30 @@ const Register = () => {
       console.log(value)
     return value && value[0].size<=2000000})
   })*/
+
+const Register = () => {
+  const [file,setFile]=useState()
   const dispatch= useDispatch()
   const {errors: userErrors,isAuth}=useSelector(state =>state.user)
   const nav=useNavigate()
   useEffect(()=>{
-    if(isAuth)
+    if(isAuth )
     nav('/')
 
-  },[isAuth])
+  },[isAuth,nav])
   const { register, handleSubmit, formState: { errors } } = useForm(/*{validationSchema:schema}*/);
- 
-  const submitFnct=(data)=>{
+  
+  const submitFnct= async (data)=>{
+    /*
+const formData = new FormData();
 
-  dispatch(registerUser(data))
-      
+        formData.append("image", data.file);
+        const res = await fetch("http://localhost:5000/users/register", {
+            method: "POST",
+            body: formData,
+        }).then((res) => res.json());
+        alert(JSON.stringify(`${res.message}, status: ${res.status}`));
+*/dispatch(registerUser({...data,file}))
   }
   return (
     <div>
@@ -37,13 +46,6 @@ const Register = () => {
           <div className="row d-flex justify-content-center   ">
             <div className="col-sm-5 text-black">
         <Form onSubmit={handleSubmit(submitFnct)} encType="multipart/form-data">
-
-        <Form.Group className="mb-3" controlId="formBasicFile">
-            <Form.Label>Image</Form.Label>
-            <Form.Control {...register("image")}    type="file" accept=".png, .jpg, .jpeg" name="image" />
-            {errors.image && <p>{errors.image.message}</p>}
-          </Form.Group>
-
 
           <Form.Group className="mb-3" controlId="formBasicText" >
             
@@ -89,7 +91,9 @@ const Register = () => {
 
           <Form.Group className="mb-3" controlId="formBasicFile">
             <Form.Label>Image</Form.Label>
-            <Form.Control {...register("image")}    type="file" accept=".png, .jpg, .jpeg" name="image" />
+            <Form.Control 
+            //{...register("image")} 
+             onChange={(e)=>setFile(e.target.files[0])} type="file" accept=".png, .jpg, .jpeg" name="image" />
             {errors.image && <p>{errors.image.message}</p>}
           </Form.Group>
 

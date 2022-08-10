@@ -56,13 +56,26 @@ exports.login= async(req,res)=>{
 }
 
 
-//@desc login as a user
+//@desc getUserInfo
 //@param GET /users/
 //@access private
 exports.getUserInfo=async(req,res)=>{
     try {
         const userInfo= await User.findById(req.userId).select('-password -__v');
         res.json(userInfo);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({msg:'something went wrong'})
+    }
+}
+
+//@desc getUsersList
+//@param GET /users/
+//@access private
+exports.getUsersList=async(req,res)=>{
+    try {
+        const usersList= await User.find({})
+        res.json(usersList);
     } catch (error) {
         console.log(error)
         res.status(500).json({msg:'something went wrong'})

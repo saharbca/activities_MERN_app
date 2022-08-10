@@ -22,15 +22,11 @@ const NavBar = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="container">
             <Link to='/'>Accueil</Link>
-            {isAuth ?  userInfo.role==="admin" &&(
-              <>
-            <Link to='/dashbord'>Dashbord</Link>
-            <Link to='/profile'>Profile</Link>
-            </>
-            ):<></>}
+            
             {isAuth ?   ( 
               <>  
-              
+              <Link to='/dashbord'>Dashbord</Link>
+              <Link to='/profile'>Profile</Link>
               <div className="input-group mb-3 ms-auto " >
                 <input type="text" className="form-control"  style={{width:"10%"}}/>
                 <div className="input-group-append">

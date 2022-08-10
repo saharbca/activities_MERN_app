@@ -28,7 +28,7 @@ function checkFileType(file, cb) {
 const storage = multer.diskStorage({
   //multers disk storage settings
   destination: (req, file, cb) => {
-    cb(null, "./client/public/uploads/");
+    cb(null, "./uploads/");
   },
   filename: (req, file, cb) => {
     const ext = file.mimetype.split("/")[1];
@@ -53,18 +53,25 @@ router.post('/login',login)
 router.post('/register',body('email','enter valide email'),body('password','enter valide password'),
 (req, res, next) => {
     upload(req, res, (err) => {
-      if (err) return res.json({ message: err.message });
+      try {
+        if (err) return res.json({ message: err.message });
       if (!req.file) return res.json({ message: "Please upload a file" });
+      //req.body.image =`http://localhost:5000/uploads/${req.file.filename}`
       req.body.image = req.file.filename;
       Jimp.read(req.file.path, function (err, test) {
         if (err) throw err;
         test
           .resize(100, 100)
           .quality(50)
-          .write("./public/uploads/pics/" + req.body.image);
-        next();
+          .write("/uploads/" + req.body.image);
+        next();console.log(req.body.image )
       });
-    });
+      } catch (error) {
+      
+        console.log(error)
+        res.status(500).json({msg:'something went wrong'})
+    }
+      })
   },register)
 router.get('/',authMiddleware,getUserInfo)
 module.exports=router

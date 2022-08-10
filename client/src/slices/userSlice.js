@@ -2,7 +2,18 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import axios from 'axios'
 export const  registerUser= createAsyncThunk('user/registerUser', async(data,{rejectWithValue})=>{
     try {
-        const res= await axios.post('/users/register',data)
+         const formData=new FormData()
+        formData.append('firstName',data.firstName)
+        formData.append('lastName',data.lastName)
+        formData.append('email',data.email)
+        formData.append('address',data.address)
+        formData.append('password',data.password)
+        formData.append('age',data.age)
+        formData.append('gender',data.gender)
+        
+        formData.append('image',data.file)
+        const res= await axios.post('/users/register',formData)
+      
         return res.data
     } catch (error) {
         return rejectWithValue(
